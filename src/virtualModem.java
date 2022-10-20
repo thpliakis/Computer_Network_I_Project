@@ -1,5 +1,4 @@
 import java.io.*;
-import java.sql.SQLOutput;
 import java.util.*;
 import ithakimodem.*;
 
@@ -116,11 +115,7 @@ public class virtualModem{
                 break;
             }
 
-
-
             modem.close();
-
-
         }
     }
 }
