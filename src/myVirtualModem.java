@@ -8,20 +8,26 @@ public class myVirtualModem{
     int speed = 50000;
     int timeOut = 2000;
     private Modem modem;
-    public static void main(String[] args) {
+    public static void main(String[] args)throws InterruptedException {
         myVirtualModem userApplication = new myVirtualModem();
         //userApplication.currentTimeIs();
-        //userApplication.echoPackage("E8948\r");
-        userApplication.echoPackage("E1376\r");
-        //userApplication.Image_request("M0215\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/image.jpeg" );
+
+        //userApplication.echoPackage("E3823\r");
+        //userApplication.Image_request("M5393\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
+        //userApplication.Image_request("G8881\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
+        //userApplication.Gps_request("P0646\r" );
+
+        /*
+        userApplication.echoPackage("E5254\r");
+        userApplication.Image_request("M4963\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
+        userApplication.Image_request("G3664\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
+        */
     }
 
     // Constructor
     public void myVirtualModem(){
 
         int k;
-        int k1=217;
-        System.out.println((char)k1);
         String rxmessage = ""; // buffer for writing the message from ithaki
 
         modem = new Modem();
@@ -41,7 +47,7 @@ public class myVirtualModem{
                 System.out.print((char)k);
                 rxmessage = rxmessage+(char)k;
                 if (rxmessage.indexOf("\r\n\n\n")>-1){
-                    //System.out.println("end of welcome message");
+                    System.out.println("end of welcome message");
                     break;
                 }
             } catch (Exception x){
@@ -84,7 +90,7 @@ public class myVirtualModem{
         try{
             // connection timeout for echooackage
             long connectionStart = System.currentTimeMillis();
-            long connectionFinish = connectionStart + 120000; // 60000/1000 = 60 seconds
+            long connectionFinish = connectionStart + 30000; // 60000/1000 = 60 seconds
             long packageTxTime = 0, packageRxTime = 0;  // transmit and receive times for a package
             int numOfPackages=0;
             long avgTime=0;  // Average time for packages
@@ -106,27 +112,28 @@ public class myVirtualModem{
                     try{
                         k = modem.read();
                         //System.out.println(k);
-                        if(k == -1) {
-                            //System.out.println("Read a whole package");
+                        rxmessage = rxmessage + (char)k;
+                        if(rxmessage.indexOf("PSTOP")>-1){
+                            //System.out.println("package is here");
                             break;
                         }
-                        rxmessage = rxmessage + (char)k;
-                        if(rxmessage.indexOf("\r\n\n\n")>-1){
-                            System.out.println("packet is here");
+                        if(k == -1) {
+                            //System.out.println("Read a whole package");
+                            System.out.println("Maybe the packet is here\n");
+                            break;
                         }
                     }catch (Exception x){
                         System.out.println(x);
                         return 0;
                     }
                 }
-                    System.out.println("Maybe the packet is here\n");
-                    packageRxTime = System.currentTimeMillis();
-                    numOfPackages +=1;
-                    avgTime = avgTime + (packageRxTime - packageTxTime);
-                    String time = String.valueOf(packageRxTime - packageTxTime)+" \n";
+                packageRxTime = System.currentTimeMillis();
+                numOfPackages +=1;
+                avgTime = avgTime + (packageRxTime - packageTxTime);
+                String time = String.valueOf(packageRxTime - packageTxTime)+" \n";
 
-                    bw.write(rxmessage +"     ........received in: "+ time );
-                    bw.newLine();
+                bw.write(rxmessage +"     ........received in: "+ time );
+                bw.newLine();
             }
             avgTime = avgTime / numOfPackages;
             System.out.println("avg time is " + avgTime);
@@ -170,18 +177,29 @@ public class myVirtualModem{
 
             long packageTxTime = 0, packageRxTime = 0;  // transmit and receive times for a package
             packageTxTime = System.currentTimeMillis();
-            int k,kPrevius=0;
+            int k;
+            boolean flag = false;
+
             for(;;) {
                 try {
                     k = modem.read();   // k 0-255, blocking entolh
-                    /*if (k == 216 && kPrevius==255) {
-                        //...
-                    }*/
-                    kPrevius = k;
+                    if(k==-1) break;
                     rxmessage = rxmessage + (char)k;
-                    System.out.print((char) k);
+                    //System.out.println(k);
+
+                    if (rxmessage.indexOf("ÿØ") > -1) {
+                        image.write(255);
+                        image.write(216);
+                        System.out.println("start reading of image");
+                        rxmessage = "";
+                        flag = true;
+                    }
+                    if(flag){
+                        image.write(k);
+                    }
                     if (rxmessage.indexOf("ÿÙ") > -1) {
                         System.out.println("end of image");
+                        image.write(k);
                         break;
                     }
                 } catch (Exception x) {
@@ -189,8 +207,8 @@ public class myVirtualModem{
                 }
             }
             packageRxTime = System.currentTimeMillis();
-            System.out.println("Finished receiving the image after:"+(packageRxTime - packageTxTime)/1000+"seconds!");
-            System.out.println("true time:"+(packageRxTime - packageTxTime)/1000+"seconds!");
+            System.out.println("Finished receiving the image after "+(packageRxTime - packageTxTime)/1000+"seconds!");
+            System.out.println("true time "+(packageRxTime - packageTxTime)/1000+"seconds!");
 
             image.close();
             modem.close();
@@ -199,6 +217,28 @@ public class myVirtualModem{
         }
     }
 
+    public void Gps_request(String gps_code){
+        this.myVirtualModem();
+        modem.write(gps_code.getBytes());
+
+        String rxmessage = ""; // buffer for writing the message from ithaki
+        int k;
+
+        for(;;){
+            try{
+                k = modem.read();   // k 0-255, blocking entolh
+                if(k==-1) break;
+                System.out.print((char)k);
+                rxmessage = rxmessage+(char)k;
+                if (rxmessage.indexOf("STOP ITHAKI GPS TRACKING")>-1){
+                    System.out.println("end of gps message");
+                    break;
+                }
+            } catch (Exception x){
+                break;
+            }
+        }
+    }
 
     public void demo(){
         int k;
@@ -220,7 +260,7 @@ public class myVirtualModem{
                 System.out.print((char)k);
                 rxmessage = rxmessage+(char)k;
                 if (rxmessage.indexOf("\r\n\n\n")>-1){
-                    System.out.println("end of welcome message");
+                    System.out.println("\nend of welcome message");
                     break;
                 }
             } catch (Exception x){
