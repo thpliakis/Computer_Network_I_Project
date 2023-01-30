@@ -5,19 +5,23 @@ import ithakimodem.*;
 
 public class myVirtualModem{
 
-    int speed = 10000;
+    int speed = 50000;
     int timeOut = 2000;
     private Modem modem;
     public static void main(String[] args) {
         myVirtualModem userApplication = new myVirtualModem();
         //userApplication.currentTimeIs();
-        userApplication.echoPackage("E2389\r");
+        //userApplication.echoPackage("E8948\r");
+        userApplication.echoPackage("E1376\r");
+        //userApplication.Image_request("M0215\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/image.jpeg" );
     }
 
     // Constructor
     public void myVirtualModem(){
 
         int k;
+        int k1=217;
+        System.out.println((char)k1);
         String rxmessage = ""; // buffer for writing the message from ithaki
 
         modem = new Modem();
@@ -71,7 +75,7 @@ public class myVirtualModem{
 
     public int echoPackage(String pack_code){
 
-        myVirtualModem();
+        this.myVirtualModem();
         BufferedWriter bw = null;
         File file ;
         FileWriter fw ;
@@ -80,7 +84,7 @@ public class myVirtualModem{
         try{
             // connection timeout for echooackage
             long connectionStart = System.currentTimeMillis();
-            long connectionFinish = connectionStart + 60000; // 60000/1000 = 60 seconds
+            long connectionFinish = connectionStart + 120000; // 60000/1000 = 60 seconds
             long packageTxTime = 0, packageRxTime = 0;  // transmit and receive times for a package
             int numOfPackages=0;
             long avgTime=0;  // Average time for packages
@@ -91,46 +95,47 @@ public class myVirtualModem{
             file = new File("/home/teras/IdeaProjects/Computer_Networks_I_Project/results/echo_package_time_results");
             fw = new FileWriter(file);
             bw = new BufferedWriter(fw);
-            bw.write(myContent);
+            //bw.write(myContent);
             //System.out.println("File written Successfully");
 
-            while((System.currentTimeMillis() < connectionFinish) && (numOfPackages<1000)){
+            while((System.currentTimeMillis() < connectionFinish) && (numOfPackages<100)){
                 packageTxTime = System.currentTimeMillis();
                 modem.write(pack_code.getBytes());
                 rxmessage = "";
                 for(;;){
                     try{
                         k = modem.read();
+                        //System.out.println(k);
                         if(k == -1) {
-                            System.out.println("CONNECTION FAILED");
+                            //System.out.println("Read a whole package");
                             break;
                         }
-                        rxmessage += + (char)k;
-                        if(rxmessage.indexOf("PSTOP\r\n")>-1){
+                        rxmessage = rxmessage + (char)k;
+                        if(rxmessage.indexOf("\r\n\n\n")>-1){
                             System.out.println("packet is here");
                         }
                     }catch (Exception x){
                         System.out.println(x);
                         return 0;
                     }
+                }
                     System.out.println("Maybe the packet is here\n");
                     packageRxTime = System.currentTimeMillis();
                     numOfPackages +=1;
                     avgTime = avgTime + (packageRxTime - packageTxTime);
                     String time = String.valueOf(packageRxTime - packageTxTime)+" \n";
 
-                    bw.write(rxmessage +"     ........received in: "+ time + "seconds");
+                    bw.write(rxmessage +"     ........received in: "+ time );
                     bw.newLine();
-                }
             }
             avgTime = avgTime / numOfPackages;
             System.out.println("avg time is " + avgTime);
             System.out.println("number of packages received " + numOfPackages);
             System.out.println("in time " + avgTime * numOfPackages);
             bw.newLine();
-            bw.write("avg time is " + avgTime);
-            bw.write("number of packages received " + numOfPackages);
-            bw.write("in time " + avgTime * numOfPackages);
+            bw.write("avg time is " + avgTime + "\n");
+            bw.write("number of packages received " + numOfPackages + "\n");
+            bw.write("in time " + avgTime * numOfPackages + "\n");
 
             bw.flush();
             bw.close();
@@ -150,9 +155,50 @@ public class myVirtualModem{
                 System.out.println("Error in closing the BufferedWriter"+ex);
             }
         }
-
          */
+        return 0;
     }
+
+    public void Image_request(String pack_code, String file_path){
+        this.myVirtualModem();
+
+        try{
+            File file = new File(file_path);
+            OutputStream image = new FileOutputStream(file);
+            modem.write(pack_code.getBytes());
+            String rxmessage="";
+
+            long packageTxTime = 0, packageRxTime = 0;  // transmit and receive times for a package
+            packageTxTime = System.currentTimeMillis();
+            int k,kPrevius=0;
+            for(;;) {
+                try {
+                    k = modem.read();   // k 0-255, blocking entolh
+                    /*if (k == 216 && kPrevius==255) {
+                        //...
+                    }*/
+                    kPrevius = k;
+                    rxmessage = rxmessage + (char)k;
+                    System.out.print((char) k);
+                    if (rxmessage.indexOf("ÿÙ") > -1) {
+                        System.out.println("end of image");
+                        break;
+                    }
+                } catch (Exception x) {
+                    break;
+                }
+            }
+            packageRxTime = System.currentTimeMillis();
+            System.out.println("Finished receiving the image after:"+(packageRxTime - packageTxTime)/1000+"seconds!");
+            System.out.println("true time:"+(packageRxTime - packageTxTime)/1000+"seconds!");
+
+            image.close();
+            modem.close();
+        }catch (Exception x){
+            System.out.println("Exception in Image request");
+        }
+    }
+
 
     public void demo(){
         int k;
