@@ -12,15 +12,15 @@ public class myVirtualModem{
         myVirtualModem userApplication = new myVirtualModem();
         //userApplication.currentTimeIs();
 
-        //userApplication.echoPackage("E3823\r");
-        //userApplication.Image_request("M5393\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
-        //userApplication.Image_request("G8881\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
+        userApplication.echoPackage("E8821\r");
+        userApplication.Image_request("M1377\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
+        userApplication.Image_request("G7375\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
         //userApplication.Gps_request("P0646\r" );
 
         /*
-        userApplication.echoPackage("E5254\r");
-        userApplication.Image_request("M4963\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
-        userApplication.Image_request("G3664\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
+        userApplication.echoPackage("E\r");
+        userApplication.Image_request("M\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
+        userApplication.Image_request("G\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
         */
     }
 
