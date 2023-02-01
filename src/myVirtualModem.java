@@ -6,19 +6,19 @@ import ithakimodem.*;
 public class myVirtualModem {
 
     int speed = 50000;
-    int timeOut = 2000;
+    int timeOut = 4000;
     private Modem modem;
 
     public static void main(String[] args) throws InterruptedException {
         myVirtualModem userApplication = new myVirtualModem();
         //userApplication.currentTimeIs();
 
-        //userApplication.echoPackage("Q4487\r");
-        //userApplication.Image_request("M1377\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
-        //userApplication.Image_request("G7375\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
-        //userApplication.Gps_request("P0497\r" );
-        //userApplication.Image_request("P0497T=225900403400T=225756403774T=225671403811\r", "/home/teras/IdeaProjects/Computer_Networks_I_Project/results/gpsImage.jpeg");
-        //userApplication.arqRequest("Q4487\r", "R5522\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/Arq.txt","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/nackResults.txt" );
+        userApplication.echoPackage("E8228\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/echo_package_time_results");
+        userApplication.Image_request("M2716\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
+        userApplication.Image_request("G0459\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
+        userApplication.arqRequest("Q1189\r", "R3134\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/Arq.txt","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/nackResults.txt" );
+        userApplication.Image_request("P0596T=225735403737T=225740403735T=225742403733T=225735403733\r", "/home/teras/IdeaProjects/Computer_Networks_I_Project/results/gpsImage.jpeg");
+        userApplication.Gps_request("P0596R=1000135\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/gpsPackages.txt" );
 
     }
 
@@ -42,7 +42,7 @@ public class myVirtualModem {
                     System.out.println("error message");
                     break;
                 }
-                System.out.print((char) k);
+                //System.out.print((char) k);
                 rxmessage = rxmessage + (char) k;
                 if (rxmessage.indexOf("\r\n\n\n") > -1) {
                     System.out.println("end of welcome message");
@@ -55,29 +55,8 @@ public class myVirtualModem {
         //modem.close();
     }
 
-    public void currentTimeIs() {
-        long millis = System.currentTimeMillis();
-        long sec = millis / 1000;
-        long csec = sec % 60;
-        long min = sec / 60;
-        long cmin = min % 60;
-        long hours = min / 60;
-        long chours = hours % 24;
-        System.out.println("The time is: " + chours + ":" + cmin + ":" + csec + "\n");
-
-        /*
-        System.out.println(millis);
-        System.out.println(csec);
-        System.out.println(cmin);
-        System.out.println(chours);
-        byte[] s = "atd2310ithaki\r".getBytes();
-        for(int i=0;i<s.length;i++){
-            System.out.println(s[i]);
-        }
-        */
-    }
-
-    public int echoPackage(String pack_code) {
+    public int echoPackage(String pack_code, String path) {
+        System.out.println("EchoPackage");
 
         this.myVirtualModem();
         BufferedWriter bw = null;
@@ -95,7 +74,7 @@ public class myVirtualModem {
             int k;
 
             // File and buffer io
-            file = new File("/home/teras/IdeaProjects/Computer_Networks_I_Project/results/echo_package_time_results");
+            file = new File(path);
             fw = new FileWriter(file);
             bw = new BufferedWriter(fw);
 
@@ -123,7 +102,7 @@ public class myVirtualModem {
                     }
                 }
                 //System.out.println("\n");
-                System.out.println(rxmessage);
+                //System.out.println(rxmessage);
                 packageRxTime = System.currentTimeMillis();
                 numOfPackages += 1;
                 avgTime = avgTime + (packageRxTime - packageTxTime);
@@ -164,6 +143,7 @@ public class myVirtualModem {
     }
 
     public void Image_request(String pack_code, String file_path) {
+        System.out.println("Image Request");
         this.myVirtualModem();
 
         try {
@@ -214,36 +194,49 @@ public class myVirtualModem {
         }
     }
 
-    public void Gps_request(String gps_code) {
+    public int Gps_request(String gps_code, String path) {
+        System.out.println("Gps reuest");
         this.myVirtualModem();
         modem.write(gps_code.getBytes());
 
+        BufferedWriter bw = null;
+        File file;
+        FileWriter fw;
         String rxmessage = ""; // buffer for writing the message from ithaki
         int k;
+        try {
+            file = new File(path);
+            fw = new FileWriter(file);
+            bw = new BufferedWriter(fw);
 
-        for (; ; ) {
-            try {
-                k = modem.read();   // k 0-255, blocking entolh
-                if (k == -1) break;
-                System.out.print((char) k);
-                rxmessage = rxmessage + (char) k;
-                if (rxmessage.indexOf("STOP ITHAKI GPS TRACKING") > -1) {
-                    System.out.println("\nend of gps message");
+            for (; ; ) {
+                try {
+                    k = modem.read();   // k 0-255, blocking entolh
+                    if (k == -1) break;
+                    //System.out.print((char) k);
+                    rxmessage = rxmessage + (char) k;
+                    if (rxmessage.indexOf("STOP ITHAKI GPS TRACKING") > -1) {
+                        System.out.println("\nend of gps message");
+                        break;
+                    }
+                } catch (Exception x) {
                     break;
                 }
-            } catch (Exception x) {
-                break;
             }
+            //for (String a : traces)
+            //    System.out.println(a);
+            bw.write(rxmessage);
+            bw.close();
+            modem.close();
+        }catch (Exception e){
+            System.out.println("\nException in echoPackage! ");
+            return 0;
         }
-        String[] traces = rxmessage.split("\r");
-        //for (String a : traces)
-        //    System.out.println(a);
-        String newCode = gps_code.substring(0, 5);
-        System.out.println(newCode);
-        modem.close();
+        return 0;
     }
 
     public void arqRequest(String ackCode, String nackCode, String pathArq, String pathResults) {
+        System.out.println("arq Request");
         this.myVirtualModem();
 
         BufferedWriter bwArq = null, bwResults = null;
