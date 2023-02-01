@@ -3,29 +3,27 @@ import java.util.*;
 import ithakimodem.*;
 
 
-public class myVirtualModem{
+public class myVirtualModem {
 
     int speed = 50000;
     int timeOut = 2000;
     private Modem modem;
-    public static void main(String[] args)throws InterruptedException {
+
+    public static void main(String[] args) throws InterruptedException {
         myVirtualModem userApplication = new myVirtualModem();
         //userApplication.currentTimeIs();
 
-        userApplication.echoPackage("E8821\r");
-        userApplication.Image_request("M1377\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
-        userApplication.Image_request("G7375\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
-        //userApplication.Gps_request("P0646\r" );
+        //userApplication.echoPackage("Q4487\r");
+        //userApplication.Image_request("M1377\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
+        //userApplication.Image_request("G7375\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
+        //userApplication.Gps_request("P0497\r" );
+        //userApplication.Image_request("P0497T=225900403400T=225756403774T=225671403811\r", "/home/teras/IdeaProjects/Computer_Networks_I_Project/results/gpsImage.jpeg");
+        //userApplication.arqRequest("Q4487\r", "R5522\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/Arq.txt","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/nackResults.txt" );
 
-        /*
-        userApplication.echoPackage("E\r");
-        userApplication.Image_request("M\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
-        userApplication.Image_request("G\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
-        */
     }
 
     // Constructor
-    public void myVirtualModem(){
+    public void myVirtualModem() {
 
         int k;
         String rxmessage = ""; // buffer for writing the message from ithaki
@@ -36,36 +34,36 @@ public class myVirtualModem{
         modem.open("ithaki");    // action, thelo na sinomiliso me thn ithaki
         modem.write("atd2310ithaki\r".getBytes());  // Connect local modem to remote ithaki modem.
 
-        System.out.println("end of welcome message");
-        for(;;){
-            try{
+        //System.out.println("end of welcome message");
+        for (; ; ) {
+            try {
                 k = modem.read();   // k 0-255, blocking entolh
-                if(k==-1) {
+                if (k == -1) {
                     System.out.println("error message");
                     break;
                 }
-                System.out.print((char)k);
-                rxmessage = rxmessage+(char)k;
-                if (rxmessage.indexOf("\r\n\n\n")>-1){
+                System.out.print((char) k);
+                rxmessage = rxmessage + (char) k;
+                if (rxmessage.indexOf("\r\n\n\n") > -1) {
                     System.out.println("end of welcome message");
                     break;
                 }
-            } catch (Exception x){
+            } catch (Exception x) {
                 break;
             }
         }
         //modem.close();
     }
 
-    public void currentTimeIs(){
+    public void currentTimeIs() {
         long millis = System.currentTimeMillis();
-        long sec = millis/1000;
-        long csec = sec%60;
-        long min = sec/60;
-        long cmin = min%60;
-        long hours = min/60;
-        long chours = hours%24;
-        System.out.println("The time is: "+chours+":"+cmin+":"+csec+"\n");
+        long sec = millis / 1000;
+        long csec = sec % 60;
+        long min = sec / 60;
+        long cmin = min % 60;
+        long hours = min / 60;
+        long chours = hours % 24;
+        System.out.println("The time is: " + chours + ":" + cmin + ":" + csec + "\n");
 
         /*
         System.out.println(millis);
@@ -79,21 +77,20 @@ public class myVirtualModem{
         */
     }
 
-    public int echoPackage(String pack_code){
+    public int echoPackage(String pack_code) {
 
         this.myVirtualModem();
         BufferedWriter bw = null;
-        File file ;
-        FileWriter fw ;
-        String myContent = "This String would be written" + " to the specified File";
+        File file;
+        FileWriter fw;
 
-        try{
+        try {
             // connection timeout for echooackage
             long connectionStart = System.currentTimeMillis();
             long connectionFinish = connectionStart + 30000; // 60000/1000 = 60 seconds
             long packageTxTime = 0, packageRxTime = 0;  // transmit and receive times for a package
-            int numOfPackages=0;
-            long avgTime=0;  // Average time for packages
+            int numOfPackages = 0;
+            long avgTime = 0;  // Average time for packages
             String rxmessage = "";
             int k;
 
@@ -101,38 +98,38 @@ public class myVirtualModem{
             file = new File("/home/teras/IdeaProjects/Computer_Networks_I_Project/results/echo_package_time_results");
             fw = new FileWriter(file);
             bw = new BufferedWriter(fw);
-            //bw.write(myContent);
-            //System.out.println("File written Successfully");
 
-            while((System.currentTimeMillis() < connectionFinish) && (numOfPackages<100)){
+            while ((System.currentTimeMillis() < connectionFinish) && (numOfPackages < 100)) {
                 packageTxTime = System.currentTimeMillis();
                 modem.write(pack_code.getBytes());
                 rxmessage = "";
-                for(;;){
-                    try{
+                for (; ; ) {
+                    try {
                         k = modem.read();
-                        //System.out.println(k);
-                        rxmessage = rxmessage + (char)k;
-                        if(rxmessage.indexOf("PSTOP")>-1){
+                        //System.out.print((char) k);
+                        rxmessage = rxmessage + (char) k;
+                        if (rxmessage.indexOf("PSTOP") > -1) {
                             //System.out.println("package is here");
                             break;
                         }
-                        if(k == -1) {
+                        if (k == -1) {
                             //System.out.println("Read a whole package");
                             System.out.println("Maybe the packet is here\n");
                             break;
                         }
-                    }catch (Exception x){
+                    } catch (Exception x) {
                         System.out.println(x);
                         return 0;
                     }
                 }
+                //System.out.println("\n");
+                System.out.println(rxmessage);
                 packageRxTime = System.currentTimeMillis();
-                numOfPackages +=1;
+                numOfPackages += 1;
                 avgTime = avgTime + (packageRxTime - packageTxTime);
-                String time = String.valueOf(packageRxTime - packageTxTime)+" \n";
+                String time = String.valueOf(packageRxTime - packageTxTime) + " \n";
 
-                bw.write(rxmessage +"     ........received in: "+ time );
+                bw.write(rxmessage + "     ........received in: " + time);
                 bw.newLine();
             }
             avgTime = avgTime / numOfPackages;
@@ -148,7 +145,7 @@ public class myVirtualModem{
             bw.close();
 
             modem.close();
-        } catch (Exception x){
+        } catch (Exception x) {
             System.out.println("\nException in echoPackage! ");
             return 0;
         }
@@ -166,25 +163,25 @@ public class myVirtualModem{
         return 0;
     }
 
-    public void Image_request(String pack_code, String file_path){
+    public void Image_request(String pack_code, String file_path) {
         this.myVirtualModem();
 
-        try{
+        try {
             File file = new File(file_path);
             OutputStream image = new FileOutputStream(file);
             modem.write(pack_code.getBytes());
-            String rxmessage="";
+            String rxmessage = "";
 
             long packageTxTime = 0, packageRxTime = 0;  // transmit and receive times for a package
             packageTxTime = System.currentTimeMillis();
             int k;
             boolean flag = false;
 
-            for(;;) {
+            for (; ; ) {
                 try {
                     k = modem.read();   // k 0-255, blocking entolh
-                    if(k==-1) break;
-                    rxmessage = rxmessage + (char)k;
+                    if (k == -1) break;
+                    rxmessage = rxmessage + (char) k;
                     //System.out.println(k);
 
                     if (rxmessage.indexOf("ÿØ") > -1) {
@@ -194,7 +191,7 @@ public class myVirtualModem{
                         rxmessage = "";
                         flag = true;
                     }
-                    if(flag){
+                    if (flag) {
                         image.write(k);
                     }
                     if (rxmessage.indexOf("ÿÙ") > -1) {
@@ -207,93 +204,138 @@ public class myVirtualModem{
                 }
             }
             packageRxTime = System.currentTimeMillis();
-            System.out.println("Finished receiving the image after "+(packageRxTime - packageTxTime)/1000+"seconds!");
-            System.out.println("true time "+(packageRxTime - packageTxTime)/1000+"seconds!");
+            System.out.println("Finished receiving the image after " + (packageRxTime - packageTxTime) / 1000 + "seconds!");
+            System.out.println("true time " + (packageRxTime - packageTxTime) / 1000 + "seconds!");
 
             image.close();
             modem.close();
-        }catch (Exception x){
+        } catch (Exception x) {
             System.out.println("Exception in Image request");
         }
     }
 
-    public void Gps_request(String gps_code){
+    public void Gps_request(String gps_code) {
         this.myVirtualModem();
         modem.write(gps_code.getBytes());
 
         String rxmessage = ""; // buffer for writing the message from ithaki
         int k;
 
-        for(;;){
-            try{
+        for (; ; ) {
+            try {
                 k = modem.read();   // k 0-255, blocking entolh
-                if(k==-1) break;
-                System.out.print((char)k);
-                rxmessage = rxmessage+(char)k;
-                if (rxmessage.indexOf("STOP ITHAKI GPS TRACKING")>-1){
-                    System.out.println("end of gps message");
+                if (k == -1) break;
+                System.out.print((char) k);
+                rxmessage = rxmessage + (char) k;
+                if (rxmessage.indexOf("STOP ITHAKI GPS TRACKING") > -1) {
+                    System.out.println("\nend of gps message");
                     break;
                 }
-            } catch (Exception x){
+            } catch (Exception x) {
                 break;
             }
         }
+        String[] traces = rxmessage.split("\r");
+        //for (String a : traces)
+        //    System.out.println(a);
+        String newCode = gps_code.substring(0, 5);
+        System.out.println(newCode);
+        modem.close();
     }
 
-    public void demo(){
-        int k;
+    public void arqRequest(String ackCode, String nackCode, String pathArq, String pathResults) {
+        this.myVirtualModem();
 
-        Modem modem;
-        modem = new Modem();
-        modem.setSpeed(1000);
-        modem.setTimeout(2000);
-        modem.open("ithaki");    // action, thelo na sinomiliso me thn ithaki
-
+        BufferedWriter bwArq = null, bwResults = null;
+        File fileArq, fileResults;
+        FileWriter fwArq, fwResults;
         String rxmessage = ""; // buffer for writing the message from ithaki
-        String txmessage = "test\r";
+        long connectionStart = System.currentTimeMillis();
+        long connectionEnd = connectionStart + 10000; // 60000/1000 = 60 seconds
+        long packageTxTime = 0, packageRxTime = 0, packageTime;  // transmit and receive times for a package
+        int numOfAttemps = 0;
+        boolean correctTransmit = true;
+        int[] arrayOfAttempts = new int[15];
+        for(int i=0;i<15;i++)
+            arrayOfAttempts[i]=0;
+        long avgTime = 0;  // Average time for packages
+        int k, fcs;
+        String[] parseRxmessage;
+        char[]  xxx16;
+        byte x;
+        int numOfPackages = 0;
 
-        // Listening loop, diabazo gramma gramma, byte after byte
-        for(;;){
-            try{
-                k = modem.read();   // k 0-255, blocking entolh
-                if(k==-1) break;
-                System.out.print((char)k);
-                rxmessage = rxmessage+(char)k;
-                if (rxmessage.indexOf("\r\n\n\n")>-1){
-                    System.out.println("\nend of welcome message");
-                    break;
+
+        try {
+            // File and buffer io
+            fileArq = new File(pathArq);
+            fileResults = new File(pathResults);
+            fwArq = new FileWriter(fileArq);
+            bwArq = new BufferedWriter(fwArq);
+            fwResults = new FileWriter(fileResults);
+            bwResults = new BufferedWriter(fwResults);
+
+            while (System.currentTimeMillis() < connectionEnd) {
+
+                if(correctTransmit){
+                    numOfAttemps = 1;
+                    packageTxTime = System.currentTimeMillis();
+                    modem.write(ackCode.getBytes());
+                }else {
+                    numOfAttemps++;
+                    modem.write(nackCode.getBytes());
                 }
-            } catch (Exception x){
-                break;
+                rxmessage = "";
+                for (;;) {
+                    try {
+                        k = modem.read();   // k 0-255, blocking entolh
+                        //System.out.print((char) k);
+                        rxmessage = rxmessage + (char) k;
+
+                        if (rxmessage.indexOf("PSTOP") > -1 || k == -1)
+                            break;
+
+                    } catch (Exception e) {
+                        System.out.println("Catched exception e");
+                        break;
+                    }
+                }
+                //System.out.println(rxmessage);
+                packageRxTime = System.currentTimeMillis();
+                packageTime = packageRxTime - packageTxTime;
+                parseRxmessage = rxmessage.split(" ");
+
+                //System.out.println("\n"+parseRxmessage[0]+"_"+parseRxmessage[1]+"_"+parseRxmessage[2]+"_"+parseRxmessage[3]+"_"+parseRxmessage[4]+"_"+parseRxmessage[5]+"_"+parseRxmessage[6]);
+
+                fcs =  Integer.parseInt(parseRxmessage[5]);
+                //System.out.println(fcs);
+                xxx16 = parseRxmessage[4].toCharArray();
+                //System.out.println(xxx16);
+                x = (byte) xxx16[1];
+                for(int i=2; i<xxx16.length-1; i++)
+                    x = (byte) (x^xxx16[i]);
+
+                //System.out.println(x);
+                if((int)x == fcs){
+                    numOfPackages++;
+                    correctTransmit = true;
+                    bwResults.write((numOfPackages + ")" + packageTime + " ; " + numOfAttemps + "\r\n"));
+                    bwResults.flush();
+                    bwArq.write(rxmessage + "\n");
+                    bwArq.flush();
+                    //arrayOfAttempts[numOfAttemps]++;
+                }else{
+                    correctTransmit = false;
+                    bwArq.write( rxmessage + "  wrong package: " + parseRxmessage[3] + ") " + "\n");
+                    bwArq.flush();
+                }
             }
-        }
+            bwArq.close();
+            bwResults.close();
 
-        rxmessage="";
-
-        // h methodos getBytes epistrefei to txmessage se array me ta grammata
-        // kai h mehodos write fortoonei ton transimt register me olous tous xarakthres enan pros enan
-        modem.write(txmessage.getBytes());
-
-        // mpaino se mode na akouso thn ithaki
-        // seriaka grafo auta pou moy stelnei h ithaki
-        for(;;){
-            try{
-                k = modem.read();   // k 0-255, blocking entolh
-                if(k==-1) {
-                    System.out.println("connection failed");
-                    break;
-                }
-                rxmessage = rxmessage+(char)k;
-                System.out.println(rxmessage);
-                if (rxmessage.indexOf("PSTOP\r\n")>-1){
-                    System.out.println("packet is here");
-                    break;
-                }
-            } catch (Exception x){
-                System.out.println(x);
-                break;
-            }
             modem.close();
+        } catch (Exception e) {
+            System.out.println("\nException in ArqRequest! ");
         }
     }
 }
