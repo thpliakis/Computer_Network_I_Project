@@ -6,6 +6,7 @@ import ithakimodem.*;
 public class myVirtualModem {
 
     int speed = 50000;
+    //int timeOut = 240000;
     int timeOut = 4000;
     private Modem modem;
 
@@ -13,12 +14,12 @@ public class myVirtualModem {
         myVirtualModem userApplication = new myVirtualModem();
         //userApplication.currentTimeIs();
 
-        userApplication.echoPackage("E8228\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/echo_package_time_results");
-        userApplication.Image_request("M2716\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
-        userApplication.Image_request("G0459\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
+        //userApplication.echoPackage("E8228\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/echo_package_time_results");
+        //userApplication.Image_request("M2716\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorFreeImage.jpeg" );
+        //userApplication.Image_request("G0459\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/errorImage.jpeg" );
         userApplication.arqRequest("Q1189\r", "R3134\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/Arq.txt","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/nackResults.txt" );
-        userApplication.Image_request("P0596T=225735403737T=225740403735T=225742403733T=225735403733\r", "/home/teras/IdeaProjects/Computer_Networks_I_Project/results/gpsImage.jpeg");
-        userApplication.Gps_request("P0596R=1000135\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/gpsPackages.txt" );
+        //userApplication.Image_request("P0596T=225735403737T=225740403735T=225742403733T=225735403733\r", "/home/teras/IdeaProjects/Computer_Networks_I_Project/results/gpsImage.jpeg");
+        //userApplication.Gps_request("P0596R=1000135\r","/home/teras/IdeaProjects/Computer_Networks_I_Project/results/gpsPackages.txt" );
 
     }
 
@@ -66,7 +67,7 @@ public class myVirtualModem {
         try {
             // connection timeout for echooackage
             long connectionStart = System.currentTimeMillis();
-            long connectionFinish = connectionStart + 30000; // 60000/1000 = 60 seconds
+            long connectionFinish = connectionStart + timeOut; // 60000/1000 = 60 seconds
             long packageTxTime = 0, packageRxTime = 0;  // transmit and receive times for a package
             int numOfPackages = 0;
             long avgTime = 0;  // Average time for packages
@@ -78,7 +79,7 @@ public class myVirtualModem {
             fw = new FileWriter(file);
             bw = new BufferedWriter(fw);
 
-            while ((System.currentTimeMillis() < connectionFinish) && (numOfPackages < 100)) {
+            while (System.currentTimeMillis() < connectionFinish ) {
                 packageTxTime = System.currentTimeMillis();
                 modem.write(pack_code.getBytes());
                 rxmessage = "";
@@ -106,19 +107,19 @@ public class myVirtualModem {
                 packageRxTime = System.currentTimeMillis();
                 numOfPackages += 1;
                 avgTime = avgTime + (packageRxTime - packageTxTime);
-                String time = String.valueOf(packageRxTime - packageTxTime) + " \n";
+                String time = String.valueOf(packageRxTime - packageTxTime);
 
-                bw.write(rxmessage + "     ........received in: " + time);
+                bw.write(time);
                 bw.newLine();
             }
             avgTime = avgTime / numOfPackages;
             System.out.println("avg time is " + avgTime);
             System.out.println("number of packages received " + numOfPackages);
             System.out.println("in time " + avgTime * numOfPackages);
-            bw.newLine();
-            bw.write("avg time is " + avgTime + "\n");
-            bw.write("number of packages received " + numOfPackages + "\n");
-            bw.write("in time " + avgTime * numOfPackages + "\n");
+            //bw.newLine();
+            //bw.write("avg time is " + avgTime + "\n");
+            //bw.write("number of packages received " + numOfPackages + "\n");
+            //bw.write("in time " + avgTime * numOfPackages + "\n");
 
             bw.flush();
             bw.close();
@@ -312,7 +313,12 @@ public class myVirtualModem {
                 if((int)x == fcs){
                     numOfPackages++;
                     correctTransmit = true;
-                    bwResults.write((numOfPackages + ")" + packageTime + " ; " + numOfAttemps + "\r\n"));
+
+                  /*  String time = String.valueOf(packageRxTime - packageTxTime);
+                    bw.write(time);
+                    bw.newLine();
+                 */
+                    bwResults.write((packageTime + " " + numOfAttemps + "\n"));
                     bwResults.flush();
                     bwArq.write(rxmessage + "\n");
                     bwArq.flush();
