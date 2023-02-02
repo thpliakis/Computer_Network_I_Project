@@ -7,7 +7,17 @@
     <list default="true" id="817496ec-b69b-4461-952e-46c1842d4eff" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Computer_Networks_I_Project/myVirtualModem.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Computer_Networks_I_Project/myVirtualModem.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/echo_package_time_results" beforeDir="false" afterPath="$PROJECT_DIR$/results/echo_package_time_results" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/Arq.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/G1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/G2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/G3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/echo_package_time_results" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/errorFreeImage.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/errorImage.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/gpsImage.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/gpsPackages,txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/nackResults.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/ploting.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/myVirtualModem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/myVirtualModem.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
